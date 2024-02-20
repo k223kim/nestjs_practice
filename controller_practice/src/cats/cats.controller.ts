@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete , Req, HttpCode, Header, Query, Redirect} from '@nestjs/common';
 import { CatsService } from './cats.service';
-import { CreateCatDto , GetCatDto} from './dto/create-cat.dto';
+import { CreateCatDto , GetCatDto, CreateCatRequest, CreateCatResponse} from './dto/create-cat.dto';
 import { UpdateCatDto } from './dto/update-cat.dto';
 import { Request } from 'express';
 
@@ -13,6 +13,15 @@ export class CatsController {
   create(@Body() createCatDto: CreateCatDto) {
       const {name, id} = createCatDto;
       return `This action adds a cat with name: ${name} and id: ${id}!`
+  }
+
+  @Post('revised')
+  createRevised(@Body() createCatRequest: CreateCatRequest){
+      const {name, id} = createCatRequest;
+      const createCatResponse : CreateCatResponse = {
+          name, id, note: "first"
+      };
+      return `This action adds a cat ${JSON.stringify(createCatResponse)}`
   }
 
   @Get('ab*cd')
