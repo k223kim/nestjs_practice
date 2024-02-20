@@ -308,3 +308,41 @@ curl http://localhost:3000/cats?limit=10&offset=10
 	controllers: [CatIdController, AppController],//add controller here
 })
 ```
+#### DTO naming conventions
+- A colleague of mine has pointed out that the above naming style of DTO can be misleading
+- Consider a case where a **POST** handler accepts some kind of DTO and returns a different kind of DTO. That being said, using the `CreateCatDto` can be misleading. The name, `CreatCatDto` is not clear whether it is being used to create a different DTO or if it is the result of the created DTO
+- To clarify, we can perform the following:
+```ts
+//src/cats/dto/create-cat.dto.ts
+export class CreateCatRequest{
+	name: string;
+	id: number;
+}
+
+export class CreateCatResponse{
+	name: string;
+	id: number;
+	note: string;
+}
+```
+
+```ts
+//src/cats/cats.controller.ts
+import { CreateCatRequest, CreateCatResponse } from './dto/create-cat.dto';
+
+...
+@Post('revised')
+createRevised(@Body() createCatRequest: CreateCatRequest){
+  const {name, id} = createCatRequest;
+  const createCatResponse : CreateCatResponse = {
+	  name, id, note: "first"
+  };
+  return `This action adds a cat ${JSON.stringify(createCatResponse)}`
+}
+```
+- This results in the following output
+```bash
+curl -X POST http://localhost:3000/cats/revised -H "Content-Type: application/json" -d '{"name": "Kaeun", "id": 97}'
+# This action adds a cat {"name":"Kaeun","id":97,"note":"first"}
+```
+- Notice that such DTO naming convention has clarified what has been requested and what is the response of it
